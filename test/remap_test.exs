@@ -42,7 +42,7 @@ defmodule RemapTest do
          %{first_name: "Sally"},
          %{first_name: "Frank"},
        ]}
-      |> remap(%{child_names: ~p"children[*].first_name"})
+      |> remap(%{child_names: ~p"children[*].first_name"l})
 
     assert actual == %{child_names: ["Sally", "Frank"]}
   end

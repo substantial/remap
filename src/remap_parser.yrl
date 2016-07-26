@@ -1,5 +1,5 @@
 Terminals '$' '@' '[' ']' '*' '.' identifier.
-Nonterminals root root_step path step member_step.
+Nonterminals root root_step path step member_expression.
 Rootsymbol root.
 
 root ->
@@ -10,7 +10,7 @@ root ->
     path : '$1'.
 
 root_step ->
-    member_step : '$1'.
+    member_expression : {child, '$1'}.
 root_step ->
     '$' : root.
 root_step ->
@@ -22,12 +22,12 @@ path ->
     step path : ['$1' | '$2'].
 
 step ->
-    '.' member_step : '$2'.
+    '.' member_expression : {child, '$2'}.
 step ->
     '[' '*' ']' : {children, all}.
 
-member_step ->
-    identifier : {member, list_to_atom(extract_token('$1'))}.
+member_expression ->
+    identifier : {identifier, list_to_atom(extract_token('$1'))}.
 
 Erlang code.
 
