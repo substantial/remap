@@ -28,11 +28,18 @@ defmodule Remap do
   end
 
   @spec sigil_m(String.t, []) :: {:remap, [instruction]}
-  defmacro sigil_m({:<<>>, _, [term]}, _modifiers) do
-    instructions = Remap.Parser.parse(term)
+  defmacro sigil_m({:<<>>, _, [term]}, modifiers) do
+    instructions =
+      term
+      |> Remap.Parser.parse
+      |> apply_modifiers(modifiers)
 
     quote do
       {:remap, unquote(instructions)}
     end
+  end
+
+  defp apply_modifiers(instructions, modifiers) do
+    instructions
   end
 end

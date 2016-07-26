@@ -27,9 +27,9 @@ instruction ->
     '[' '*' ']' : {children, all}.
 
 key_instruction ->
-    key : {key, extract_token('$1')}.
+    key : {key, list_to_atom(extract_token('$1'))}.
 
 Erlang code.
 
 extract_token({_Token, _Line, Value}) ->
-     list_to_binary(Value).
+     Value.
