@@ -1,5 +1,6 @@
 defmodule Remap do
-  @type instruction :: :root
+  @type path :: [step]
+  @type step :: :root
     | {:key, String.t}
     | {:children, :all}
 
@@ -7,39 +8,39 @@ defmodule Remap do
     for {key, value} <- map, into: %{}, do: {key, apply_mapping(value, data)}
   end
 
-  def apply_mapping({:remap, instructions}, data) do
-    do_instructions(instructions, data, data)
+  def apply_mapping({:remap, path}, data) do
+    follow_path(path, data, data)
   end
 
-  @spec do_instructions([instruction], any, any) :: any
-  def do_instructions([], _root, current), do: current
-  def do_instructions([:root | rest], root, _current) do
-    do_instructions(rest, root, root)
+  @spec follow_path(path, any, any) :: any
+  def follow_path([], _root, current), do: current
+  def follow_path([:root | rest], root, _current) do
+    follow_path(rest, root, root)
   end
 
-  def do_instructions([{:key, key} | rest], root, current) do
-    do_instructions(rest, root, Access.get(current, key))
+  def follow_path([{:key, key} | rest], root, current) do
+    follow_path(rest, root, Access.get(current, key))
   end
 
-  def do_instructions([{:children, :all} | rest], root, current) do
+  def follow_path([{:children, :all} | rest], root, current) do
     for child <- current do
-      do_instructions(rest, root, child)
+      follow_path(rest, root, child)
     end
   end
 
-  @spec sigil_m(String.t, []) :: {:remap, [instruction]}
-  defmacro sigil_m({:<<>>, _, [term]}, modifiers) do
-    instructions =
+  @spec sigil_p(String.t, []) :: {:remap, path}
+  defmacro sigil_p({:<<>>, _, [term]}, modifiers) do
+    path =
       term
       |> Remap.Parser.parse
       |> apply_modifiers(modifiers)
 
     quote do
-      {:remap, unquote(instructions)}
+      {:remap, unquote(path)}
     end
   end
 
-  defp apply_modifiers(instructions, modifiers) do
-    instructions
+  defp apply_modifiers(path, _modifiers) do
+    path
   end
 end

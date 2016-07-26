@@ -6,7 +6,7 @@ defmodule RemapTest do
   test "map single key" do
     actual =
       %{first_name: "John"}
-      |> remap(%{name: ~m"first_name"})
+      |> remap(%{name: ~p"first_name"})
 
     assert actual == %{name: "John"}
   end
@@ -18,8 +18,8 @@ defmodule RemapTest do
         last_name: "Doe",
       }
       |> remap(%{
-        name: ~m"first_name",
-        surname: ~m"last_name",
+        name: ~p"first_name",
+        surname: ~p"last_name",
       })
 
     assert actual == %{
@@ -31,7 +31,7 @@ defmodule RemapTest do
   test "map nested keys" do
     actual =
       %{person: %{first_name: "John"}}
-      |> remap(%{name: ~m"person.first_name"})
+      |> remap(%{name: ~p"person.first_name"})
 
     assert actual == %{name: "John"}
   end
@@ -42,7 +42,7 @@ defmodule RemapTest do
          %{first_name: "Sally"},
          %{first_name: "Frank"},
        ]}
-      |> remap(%{child_names: ~m"children[*].first_name"})
+      |> remap(%{child_names: ~p"children[*].first_name"})
 
     assert actual == %{child_names: ["Sally", "Frank"]}
   end

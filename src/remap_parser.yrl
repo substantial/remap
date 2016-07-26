@@ -1,32 +1,32 @@
 Terminals '$' '@' '[' ']' '*' '.' key.
-Nonterminals root root_instruction instructions instruction key_instruction.
+Nonterminals root root_step path step key_step.
 Rootsymbol root.
 
 root ->
-    root_instruction instructions : ['$1' | '$2'].
+    root_step path : ['$1' | '$2'].
 root ->
-    root_instruction : ['$1'].
+    root_step : ['$1'].
 root ->
-    instructions : '$1'.
+    path : '$1'.
 
-root_instruction ->
-    key_instruction : '$1'.
-root_instruction ->
+root_step ->
+    key_step : '$1'.
+root_step ->
     '$' : root.
-root_instruction ->
+root_step ->
     '@' : current.
 
-instructions ->
-    instruction : ['$1'].
-instructions ->
-    instruction instructions : ['$1' | '$2'].
+path ->
+    step : ['$1'].
+path ->
+    step path : ['$1' | '$2'].
 
-instruction ->
-    '.' key_instruction : '$2'.
-instruction ->
+step ->
+    '.' key_step : '$2'.
+step ->
     '[' '*' ']' : {children, all}.
 
-key_instruction ->
+key_step ->
     key : {key, list_to_atom(extract_token('$1'))}.
 
 Erlang code.
