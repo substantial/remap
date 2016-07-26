@@ -29,11 +29,7 @@ defmodule Remap do
 
   @spec sigil_m(String.t, []) :: {:remap, [instruction]}
   def sigil_m(term, _modifiers) do
-    {:ok, tokens, _} =
-      term
-      |> String.to_charlist
-      |> :remap_lexer.string
-
-    {:remap, tokens}
+    instructions = Remap.Parser.parse(term)
+    {:remap, instructions}
   end
 end

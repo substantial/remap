@@ -1,5 +1,5 @@
 defmodule RemapTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Remap
   doctest Remap
 

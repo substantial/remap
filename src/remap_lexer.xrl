@@ -3,14 +3,16 @@ Definitions.
 INT = [0-9]+
 ATOM = :[a-z_]+
 WHITESPACE = [\s\t\n\r]
-KEY = [^.\[]+
+KEY = [A-Za-z0-9_-]+
 
 Rules.
 
-\$ : {token, root}.
-@ : {token, current}.
-\. : skip_token.
-{KEY} : {token, {key, list_to_binary(TokenChars)}}.
-\[\*\] : {token, {children, all}}.
+\$ : {token, {'$', TokenLine}}.
+@ : {token, {'@', TokenLine}}.
+\. : {token, {'.', TokenLine}}.
+\[ : {token, {'[', TokenLine}}.
+\] : {token, {']', TokenLine}}.
+\* : {token, {'*', TokenLine}}.
+{KEY} : {token, {key, TokenLine, TokenChars}}.
 
 Erlang code.

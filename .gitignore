@@ -17,3 +17,4 @@ erl_crash.dump
 *.ez
 
 /src/remap_lexer.erl
+/src/remap_parser.erl
