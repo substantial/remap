@@ -9,7 +9,18 @@ defmodule Remap.Mixfile do
      start_permanent: Mix.env == :prod,
      description: description(),
      package: package(),
-     deps: deps()]
+     deps: deps(),
+     dialyzer: [
+       flags: ~w[
+         -Wno_opaque
+         -Wno_return
+         -Werror_handling
+         -Wunderspecs
+         -Wrace_conditions
+         --fullpath
+       ],
+     ],
+    ]
   end
 
   def application do
