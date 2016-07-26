@@ -1,4 +1,6 @@
 defmodule Remap do
+  alias Remap.Node
+
   @type path :: [step]
   @type member :: {:identifier, atom}
   @type step :: :root
@@ -6,29 +8,29 @@ defmodule Remap do
     | {:descendant, member}
     | {:children, :all}
   @type modifier :: ?s | ?l
-  @type modifiers :: [modifier]
 
+  @spec remap(Node.t, any) :: [any]
   def remap(data, map) do
     for {key, value} <- map, into: %{}, do: {key, apply_mapping(value, data)}
   end
 
-  def apply_mapping({:remap_path, :list, path}, data) do
+  defp apply_mapping({:remap_path, :list, path}, data) do
     follow_path(path, data, data)
   end
 
-  def apply_mapping({:remap_path, :element, path}, data) do
+  defp apply_mapping({:remap_path, :element, path}, data) do
     result = follow_path(path, data, data)
     Enum.at(result, 0)
   end
 
-  @spec follow_path(path, any, any) :: any
+  @spec follow_path(path, Node.t, Node.t) :: any
   defp follow_path([], _root, current), do: [current]
   defp follow_path([:root | rest], root, _current) do
     follow_path(rest, root, root)
   end
 
   defp follow_path([{:child, member} | rest], root, current) do
-    children = get_members(current, member)
+    children = Node.get_members(current, member)
     Enum.flat_map(children, &follow_path(rest, root, &1))
   end
 
@@ -41,29 +43,11 @@ defmodule Remap do
     Enum.flat_map(current, &follow_path(rest, root, &1))
   end
 
-  @spec get_members(any, member) :: any
-  defp get_members(data, {:identifier, key}) when is_map(data) do
-    if Map.has_key?(data, key) do
-      [Map.get(data, key)]
-    else
-      []
-    end
+  @spec traverse(Node.t, member) :: [any]
+  defp traverse(data, member) do
+    Node.get_members(data, member) ++
+      Enum.flat_map(Node.get_children(data), &traverse(&1, member))
   end
-
-  defp get_members(_data, {:identifier, _key}), do: []
-
-  @spec traverse(any, member) :: [any]
-  defp traverse(data, member) when is_map(data) do
-    get_members(data, member) ++
-      Enum.flat_map(data, fn {_key, value} -> traverse(value, member) end)
-  end
-
-  defp traverse(data, member) when is_list(data) do
-    get_members(data, member) ++
-      Enum.flat_map(data, fn value -> traverse(value, member) end)
-  end
-
-  defp traverse(_data, _member), do: []
 
   defmacro sigil_p({:<<>>, _, [term]}, modifiers) do
     path =
@@ -83,13 +67,15 @@ defmodule Remap do
     end
   end
 
-  @spec apply_modifiers(path, modifiers) :: path
+  @spec apply_modifiers(path, [modifier]) :: path
   defp apply_modifiers(path, []), do: path
+
   defp apply_modifiers(path, [?s | modifiers]) do
     path
     |> Enum.map(&stringify_keys/1)
     |> apply_modifiers(modifiers)
   end
+
   defp apply_modifiers(path, [_ | modifiers]), do: apply_modifiers(path, modifiers)
 
   @spec stringify_keys(step) :: step
