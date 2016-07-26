@@ -46,4 +46,14 @@ defmodule RemapTest do
 
     assert actual == %{child_names: ["Sally", "Frank"]}
   end
+
+  describe "s modifier" do
+    test "treat keys as strings" do
+      actual =
+        %{"person" => %{"first_name" => "John"}}
+        |> remap(%{name: ~p"person.first_name"s})
+
+      assert actual == %{name: "John"}
+    end
+  end
 end

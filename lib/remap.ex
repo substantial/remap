@@ -1,8 +1,10 @@
 defmodule Remap do
   @type path :: [step]
   @type step :: :root
-    | {:member, String.t}
+    | {:member, atom}
     | {:children, :all}
+  @type modifier :: ?s
+  @type modifiers :: [modifier]
 
   def remap(data, map) do
     for {key, value} <- map, into: %{}, do: {key, apply_mapping(value, data)}
@@ -28,7 +30,7 @@ defmodule Remap do
     end
   end
 
-  @spec sigil_p(String.t, []) :: {:remap, path}
+  @spec sigil_p({:<<>>, any, [String.t]}, modifiers) :: {:remap, path}
   defmacro sigil_p({:<<>>, _, [term]}, modifiers) do
     path =
       term
@@ -40,7 +42,15 @@ defmodule Remap do
     end
   end
 
-  defp apply_modifiers(path, _modifiers) do
+  @spec apply_modifiers(path, modifiers) :: path
+  defp apply_modifiers(path, []), do: path
+  defp apply_modifiers(path, [?s | modifiers]) do
     path
+    |> Enum.map(&stringify_keys/1)
+    |> apply_modifiers(modifiers)
   end
+
+  @spec stringify_keys(step) :: step
+  defp stringify_keys({:member, key}), do: {:member, Atom.to_string(key)}
+  defp stringify_keys(step), do: step
 end
