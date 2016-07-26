@@ -23,7 +23,7 @@ defmodule Remap.ParserTest do
   describe "wildcard (*)" do
     test "all children" do
       assert Parser.parse("foo[*]") ==
-        [{:child, {:identifier, :foo}}, {:children, :all}]
+        [{:child, {:identifier, :foo}}, {:child, :wildcard}]
     end
 
     test "wildcard members" do

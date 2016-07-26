@@ -7,7 +7,6 @@ defmodule Remap do
   @type step :: :root
     | {:child, member}
     | {:descendant, member}
-    | {:children, :all}
   @type modifier :: ?s | ?l
 
   @spec remap(Node.t, any) :: [any]
@@ -40,9 +39,9 @@ defmodule Remap do
     Enum.flat_map(children, &follow_path(rest, root, &1))
   end
 
-  defp follow_path([{:children, :all} | rest], root, current) do
-    Enum.flat_map(current, &follow_path(rest, root, &1))
-  end
+  # defp follow_path([{:subscript, subscript} | rest]) do
+  #   Enum.flat_map(current, &)
+  # end
 
   @spec traverse(Node.t, member) :: [any]
   defp traverse(data, member) do

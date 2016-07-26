@@ -22,3 +22,6 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     end
     ```
 
+## Acknowledgments
+
+* BNF grammar lifted from https://github.com/dchester/jsonpath

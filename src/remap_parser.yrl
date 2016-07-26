@@ -1,37 +1,111 @@
-Terminals '$' '[' ']' '*' '.' '..' identifier.
-Nonterminals root root_step path step member_expression.
+Terminals '$' '[' ']' '*' '.' '..' ','
+    identifier
+    string
+    integer
+    array_slice
+    script_expression
+    filter_expression.
+Nonterminals
+    root
+    leading_component
+    child_member_component
+    descendant_member_component
+    member_expression
+    member_component
+    subscript_component
+    child_subscript_component
+    descendant_subscript_component
+    subscript
+    subscript_expression_list
+    subscript_expression_listable
+    path_components
+    path_component
+    subscript_expression.
 Rootsymbol root.
 
 root ->
-    root_step path : ['$1' | '$2'].
+    leading_component : ['$1'].
 root ->
-    root_step : ['$1'].
-root ->
-    path : '$1'.
+    leading_component path_components : ['$1' | '$2'].
 
-root_step ->
+leading_component ->
     member_expression : {child, '$1'}.
-root_step ->
+leading_component ->
+    member_component : '$1'.
+leading_component ->
+    subscript_component : '$1'.
+leading_component ->
     '$' : root.
 
-path ->
-    step : ['$1'].
-path ->
-    step path : ['$1' | '$2'].
+path_components ->
+    path_component : ['$1'].
+path_components ->
+    path_component path_components : ['$1' | '$2'].
 
-step ->
-    '..' member_expression : {descendant, '$2'}.
-step ->
+path_component ->
+    member_component : '$1'.
+path_component ->
+    subscript_component : '$1'.
+
+member_component ->
+    child_member_component : '$1'.
+member_component ->
+    descendant_member_component : '$1'.
+
+child_member_component ->
     '.' member_expression : {child, '$2'}.
-step ->
-    '[' '*' ']' : {children, all}.
 
+descendant_member_component ->
+    '..' member_expression : {descendant, '$2'}.
+
+member_expression ->
+    '*' : wildcard.
 member_expression ->
     identifier : {identifier, list_to_atom(extract_token('$1'))}.
 member_expression ->
+    script_expression : {script_expression, extract_token('$1')}.
+member_expression ->
+    integer : {integer, extract_token('$1')}.
+
+subscript_component ->
+    child_subscript_component : '$1'.
+subscript_component ->
+    descendant_subscript_component : '$1'.
+
+child_subscript_component ->
+    '[' subscript ']' : {child, '$2'}.
+
+descendant_subscript_component ->
+    '..' '[' subscript ']' : {descendant, '$1'}.
+
+subscript ->
+    subscript_expression : '$1'.
+subscript ->
+    subscript_expression_list : '$1'.
+
+subscript_expression_list ->
+    subscript_expression_listable : '$1'.
+subscript_expression_list ->
+    subscript_expression_list ',' subscript_expression_listable.
+
+subscript_expression_listable ->
+    integer.
+subscript_expression_listable ->
+    string : to_string(extract_token('$1')).
+subscript_expression_listable ->
+    array_slice.
+
+subscript_expression ->
     '*' : wildcard.
+subscript_expression ->
+    script_expression.
+subscript_expression ->
+    filter_expression.
 
 Erlang code.
 
 extract_token({_Token, _Line, Value}) ->
      Value.
+
+to_string(Value) ->
+    list_to_binary(string:substr(Value, 2, string:len(Value) - 2)).
