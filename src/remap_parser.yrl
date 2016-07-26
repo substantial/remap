@@ -1,4 +1,4 @@
-Terminals '$' '[' ']' '*' '.' identifier.
+Terminals '$' '[' ']' '*' '.' '..' identifier.
 Nonterminals root root_step path step member_expression.
 Rootsymbol root.
 
@@ -19,6 +19,8 @@ path ->
 path ->
     step path : ['$1' | '$2'].
 
+step ->
+    '..' member_expression : {descendant, '$2'}.
 step ->
     '.' member_expression : {child, '$2'}.
 step ->

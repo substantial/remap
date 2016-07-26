@@ -47,6 +47,51 @@ defmodule RemapTest do
     assert actual == %{child_names: ["Sally", "Frank"]}
   end
 
+  describe "descendant steps (..)" do
+    test "extract list of child properties" do
+      actual =
+        %{children: [
+             %{first_name: "Sally"},
+             %{first_name: "Frank"},
+           ]}
+           |> remap(%{child_names: ~p"$..first_name"l})
+
+      assert actual == %{child_names: ["Sally", "Frank"]}
+    end
+
+    test "nested child properties are totally flattened" do
+      actual =
+        %{children: [
+             [%{first_name: "Sally"}],
+             %{first_name: "Frank"},
+           ]}
+           |> remap(%{child_names: ~p"$..first_name"l})
+
+      assert actual == %{child_names: ["Sally", "Frank"]}
+    end
+
+    test "recursive child properties" do
+      actual =
+        %{foo: [
+           %{foo: %{foo: :bar}},
+         ]}
+         |> remap(%{foos: ~p"$..foo"l})
+
+      assert actual == %{foos: [[%{foo: %{foo: :bar}}], %{foo: :bar}, :bar]}
+    end
+
+    test "start with .." do
+      actual =
+        %{children: [
+             %{first_name: "Sally"},
+             %{first_name: "Frank"},
+           ]}
+           |> remap(%{child_names: ~p"..first_name"l})
+
+      assert actual == %{child_names: ["Sally", "Frank"]}
+    end
+  end
+
   describe "s modifier" do
     test "treat keys as strings" do
       actual =

@@ -10,6 +10,7 @@ Rules.
 \$ : {token, {'$', TokenLine}}.
 @ : {token, {'@', TokenLine}}.
 \. : {token, {'.', TokenLine}}.
+\.\. : {token, {'..', TokenLine}}.
 \[ : {token, {'[', TokenLine}}.
 \] : {token, {']', TokenLine}}.
 \* : {token, {'*', TokenLine}}.

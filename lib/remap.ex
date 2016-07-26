@@ -3,6 +3,7 @@ defmodule Remap do
   @type member :: {:identifier, atom}
   @type step :: :root
     | {:child, member}
+    | {:descendant, member}
     | {:children, :all}
   @type modifier :: ?s | ?l
   @type modifiers :: [modifier]
@@ -31,14 +32,38 @@ defmodule Remap do
     Enum.flat_map(children, &follow_path(rest, root, &1))
   end
 
+  defp follow_path([{:descendant, member} | rest], root, current) do
+    children = traverse(current, member)
+    Enum.flat_map(children, &follow_path(rest, root, &1))
+  end
+
   defp follow_path([{:children, :all} | rest], root, current) do
     Enum.flat_map(current, &follow_path(rest, root, &1))
   end
 
   @spec get_members(any, member) :: any
-  defp get_members(data, {:identifier, key}) do
-    [Access.get(data, key)]
+  defp get_members(data, {:identifier, key}) when is_map(data) do
+    if Map.has_key?(data, key) do
+      [Map.get(data, key)]
+    else
+      []
+    end
   end
+
+  defp get_members(_data, {:identifier, _key}), do: []
+
+  @spec traverse(any, member) :: [any]
+  defp traverse(data, member) when is_map(data) do
+    get_members(data, member) ++
+      Enum.flat_map(data, fn {_key, value} -> traverse(value, member) end)
+  end
+
+  defp traverse(data, member) when is_list(data) do
+    get_members(data, member) ++
+      Enum.flat_map(data, fn value -> traverse(value, member) end)
+  end
+
+  defp traverse(_data, _member), do: []
 
   defmacro sigil_p({:<<>>, _, [term]}, modifiers) do
     path =
