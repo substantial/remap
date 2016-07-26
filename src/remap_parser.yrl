@@ -28,6 +28,8 @@ step ->
 
 member_expression ->
     identifier : {identifier, list_to_atom(extract_token('$1'))}.
+member_expression ->
+    '*' : wildcard.
 
 Erlang code.
 

@@ -19,11 +19,13 @@ end
 
 defimpl Remap.Node, for: List do
   def get_members(_list, {:identifier, _key}), do: []
+  def get_members(list, :wildcard), do: list
 
   def get_children(list), do: list
 end
 
 defimpl Remap.Node, for: Map do
+  def get_members(map, :wildcard), do: get_children(map)
   def get_members(map, {:identifier, key}) do
     if Map.has_key?(map, key) do
       [Map.get(map, key)]

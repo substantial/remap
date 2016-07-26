@@ -3,6 +3,7 @@ defmodule Remap do
 
   @type path :: [step]
   @type member :: {:identifier, atom}
+    | :wildcard
   @type step :: :root
     | {:child, member}
     | {:descendant, member}

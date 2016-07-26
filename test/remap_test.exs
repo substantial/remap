@@ -47,6 +47,21 @@ defmodule RemapTest do
     assert actual == %{child_names: ["Sally", "Frank"]}
   end
 
+  describe "wildcard (*)" do
+    test "get values of map" do
+      values =
+        %{
+          foo: "1",
+          bar: "2",
+        }
+        |> remap(%{values: ~p"*"l})
+        |> Map.get(:values)
+        |> Enum.sort # order is not guaranteed by maps
+
+      assert values == ["1", "2"]
+    end
+  end
+
   describe "descendant steps (..)" do
     test "extract list of child properties" do
       actual =
