@@ -3,7 +3,7 @@ Definitions.
 INT = [0-9]+
 ATOM = :[a-z_]+
 WHITESPACE = [\s\t\n\r]
-KEY = [A-Za-z0-9_-]+
+IDENTIFIER = [A-Za-z0-9_-]+
 
 Rules.
 
@@ -13,6 +13,6 @@ Rules.
 \[ : {token, {'[', TokenLine}}.
 \] : {token, {']', TokenLine}}.
 \* : {token, {'*', TokenLine}}.
-{KEY} : {token, {key, TokenLine, TokenChars}}.
+{IDENTIFIER} : {token, {identifier, TokenLine, TokenChars}}.
 
 Erlang code.

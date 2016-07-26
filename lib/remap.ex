@@ -1,7 +1,7 @@
 defmodule Remap do
   @type path :: [step]
   @type step :: :root
-    | {:key, String.t}
+    | {:member, String.t}
     | {:children, :all}
 
   def remap(data, map) do
@@ -18,7 +18,7 @@ defmodule Remap do
     follow_path(rest, root, root)
   end
 
-  def follow_path([{:key, key} | rest], root, current) do
+  def follow_path([{:member, key} | rest], root, current) do
     follow_path(rest, root, Access.get(current, key))
   end
 
