@@ -1,10 +1,11 @@
-Terminals '$' '[' ']' '*' '.' '..' ','
+Terminals '$' '[' ']' '*' '.' '..'
+    %% ','
     identifier
     string
     integer
-    array_slice
-    script_expression
-    filter_expression.
+    %% array_slice
+    %% filter_expression
+    script_expression.
 Nonterminals
     root
     leading_component
@@ -85,22 +86,22 @@ subscript ->
 
 subscript_expression_list ->
     subscript_expression_listable : '$1'.
-subscript_expression_list ->
-    subscript_expression_list ',' subscript_expression_listable.
+%% subscript_expression_list ->
+%%     subscript_expression_list ',' subscript_expression_listable.
 
-subscript_expression_listable ->
-    integer.
+%% subscript_expression_listable ->
+%%     integer.
 subscript_expression_listable ->
     string : {identifier, to_string(extract_token('$1'))}.
-subscript_expression_listable ->
-    array_slice.
+%% subscript_expression_listable ->
+%%     array_slice.
 
 subscript_expression ->
     '*' : wildcard.
-subscript_expression ->
-    script_expression.
-subscript_expression ->
-    filter_expression.
+%% subscript_expression ->
+%%     script_expression.
+%% subscript_expression ->
+%%     filter_expression.
 
 Erlang code.
 
