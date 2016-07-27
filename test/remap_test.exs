@@ -3,6 +3,10 @@ defmodule RemapTest do
   import Remap
   doctest Remap
 
+  defmodule TestStruct do
+    defstruct [:value]
+  end
+
   test "map single key" do
     actual =
       %{first_name: "John"}
@@ -54,6 +58,14 @@ defmodule RemapTest do
         child_names: ["John", "Sally"],
       },
     }
+  end
+
+  test "struct template" do
+    actual =
+      %{foo: "bar"}
+      |> remap(%TestStruct{value: ~p"foo"})
+
+    assert actual == %TestStruct{value: "bar"}
   end
 
   test "map multiple keys" do

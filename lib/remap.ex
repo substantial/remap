@@ -17,7 +17,7 @@ defmodule Remap do
 
   @spec do_remap(Node.t, template, Node.t) :: any
   def do_remap(data, template, root) when is_map(template) do
-    for {key, child_template} <- template, into: %{}  do
+    for {key, child_template} <- Map.to_list(template), into: %{}  do
       {key, apply_template(data, child_template, root)}
     end
   end
@@ -39,9 +39,11 @@ defmodule Remap do
     Enum.at(result, 0)
   end
 
-  defp apply_template(data, template, root) do
+  defp apply_template(data, template, root) when is_list(template) or is_map(template) do
     do_remap(data, template, root)
   end
+
+  defp apply_template(_data, template, _root), do: template
 
   @spec follow_path(path, Node.t, Node.t) :: any
   defp follow_path([], _root, current), do: [current]
