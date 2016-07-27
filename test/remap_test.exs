@@ -36,15 +36,36 @@ defmodule RemapTest do
     assert actual == %{name: "John"}
   end
 
-  test "extract list of children properties" do
-    actual =
-      %{children: [
-         %{first_name: "Sally"},
-         %{first_name: "Frank"},
-       ]}
-      |> remap(%{child_names: ~p"children[*].first_name"l})
+  describe "subscript ([...])" do
+    test "extract list of children properties" do
+      actual =
+        %{children: [
+          %{first_name: "Sally"},
+          %{first_name: "Frank"},
+        ]}
+        |> remap(%{child_names: ~p"children[*].first_name"l})
 
-    assert actual == %{child_names: ["Sally", "Frank"]}
+      assert actual == %{child_names: ["Sally", "Frank"]}
+    end
+
+    test "extract string key" do
+      actual =
+        %{"foo" => "bar"}
+      |> remap(%{foo: ~p(["foo"])})
+
+      assert actual == %{foo: "bar"}
+    end
+
+    test "descendant subscript with string key" do
+      actual =
+        %{
+          "x" => %{"foo" => "bar1"},
+          "y" => %{"foo" => "bar2"},
+        }
+        |> remap(%{foo: ~p(..["foo"])l})
+
+      assert actual == %{foo: ["bar1", "bar2"]}
+    end
   end
 
   describe "wildcard (*)" do

@@ -20,6 +20,28 @@ defmodule Remap.ParserTest do
       [:root, {:child, {:identifier, :foo}}]
   end
 
+  describe "subscript ([])" do
+    test "descendant wildcard" do
+      assert Parser.parse("..[*]") ==
+        [{:descendant, :wildcard}]
+    end
+
+    test "child wildcard" do
+      assert Parser.parse("[*]") ==
+        [{:child, :wildcard}]
+    end
+
+    test "child string identifier" do
+      assert Parser.parse("[\"foo\"]") ==
+        [{:child, {:identifier, "foo"}}]
+    end
+
+    test "descendant string identifier" do
+      assert Parser.parse("$..[\"foo\"]") ==
+        [:root, {:descendant, {:identifier, "foo"}}]
+    end
+  end
+
   describe "wildcard (*)" do
     test "all children" do
       assert Parser.parse("foo[*]") ==

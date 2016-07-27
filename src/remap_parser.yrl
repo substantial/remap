@@ -76,7 +76,7 @@ child_subscript_component ->
     '[' subscript ']' : {child, '$2'}.
 
 descendant_subscript_component ->
-    '..' '[' subscript ']' : {descendant, '$1'}.
+    '..' '[' subscript ']' : {descendant, '$3'}.
 
 subscript ->
     subscript_expression : '$1'.
@@ -91,7 +91,7 @@ subscript_expression_list ->
 subscript_expression_listable ->
     integer.
 subscript_expression_listable ->
-    string : to_string(extract_token('$1')).
+    string : {identifier, to_string(extract_token('$1'))}.
 subscript_expression_listable ->
     array_slice.
 
