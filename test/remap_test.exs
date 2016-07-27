@@ -11,6 +11,30 @@ defmodule RemapTest do
     assert actual == %{name: "John"}
   end
 
+  test "list as data" do
+    actual =
+      [%{first_name: "John"}]
+      |> remap(%{name: ~p"[*].first_name"})
+
+    assert actual == %{name: "John"}
+  end
+
+  test "list as result" do
+    actual =
+      [%{first_name: "John"}]
+      |> remap([~p"[*].first_name"])
+
+    assert actual == ["John"]
+  end
+
+  test "single value as result" do
+    actual =
+      [%{first_name: "John"}]
+      |> remap(~p"[*].first_name")
+
+    assert actual == "John"
+  end
+
   test "map multiple keys" do
     actual =
       %{

@@ -8,10 +8,19 @@ defmodule Remap do
     | {:child, member}
     | {:descendant, member}
   @type modifier :: ?s | ?l
+  @type mapping :: %{} | [any] | path
 
-  @spec remap(Node.t, any) :: [any]
-  def remap(data, map) do
-    for {key, value} <- map, into: %{}, do: {key, apply_mapping(value, data)}
+  @spec remap(Node.t, mapping) :: [any]
+  def remap(data, map_mapping) when is_map(map_mapping) do
+    for {key, value} <- map_mapping, into: %{}, do: {key, apply_mapping(value, data)}
+  end
+
+  def remap(data, list_mapping) when is_list(list_mapping) do
+    for value <- list_mapping, do: apply_mapping(value, data)
+  end
+
+  def remap(data, mapping) do
+    apply_mapping(mapping, data)
   end
 
   defp apply_mapping({:remap_path, :list, path}, data) do
