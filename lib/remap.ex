@@ -39,6 +39,13 @@ defmodule Remap do
     Enum.at(result, 0)
   end
 
+  defp apply_template(data, {{:remap_path, :list, path}, template}, root) do
+    results = follow_path(path, data, root)
+    for result <- results do
+      do_remap(result, template, root)
+    end
+  end
+
   defp apply_template(data, template, root) when is_list(template) or is_map(template) do
     do_remap(data, template, root)
   end

@@ -93,6 +93,26 @@ defmodule RemapTest do
     assert actual == %{name: "John"}
   end
 
+  describe "path tuples" do
+    test "nested remap" do
+      actual =
+        %{
+          children: [
+            %{first_name: "Sally"},
+            %{first_name: "Frank"},
+          ]
+        }
+        |> remap(%{
+          children: {
+            ~p"children[*]"l,
+            %{name: ~p"first_name"},
+          },
+        })
+
+      assert actual == %{children: [%{name: "Sally"}, %{name: "Frank"}]}
+    end
+  end
+
   describe "subscript ([...])" do
     test "extract list of children properties" do
       actual =
