@@ -10,26 +10,37 @@ defmodule Remap do
   @type modifier :: ?s | ?l
   @type template :: %{} | [any] | path
 
-  @spec remap(Node.t, template) :: [any]
-  def remap(data, template) when is_map(template) do
-    for {key, value} <- template, into: %{}, do: {key, apply_template(value, data)}
-  end
-
-  def remap(data, template) when is_list(template) do
-    for value <- template, do: apply_template(value, data)
-  end
-
+  @spec remap(Node.t, template) :: any
   def remap(data, template) do
-    apply_template(template, data)
+    do_remap(data, template, data)
   end
 
-  defp apply_template({:remap_path, :list, path}, data) do
-    follow_path(path, data, data)
+  @spec do_remap(Node.t, template, Node.t) :: any
+  def do_remap(data, template, root) when is_map(template) do
+    for {key, child_template} <- template, into: %{}  do
+      {key, apply_template(data, child_template, root)}
+    end
   end
 
-  defp apply_template({:remap_path, :element, path}, data) do
-    result = follow_path(path, data, data)
+  def do_remap(data, template, root) when is_list(template) do
+    for child_template <- template, do: apply_template(data, child_template, root)
+  end
+
+  def do_remap(data, template, root) do
+    apply_template(data, template, root)
+  end
+
+  defp apply_template(data, {:remap_path, :list, path}, root) do
+    follow_path(path, data, root)
+  end
+
+  defp apply_template(data, {:remap_path, :element, path}, root) do
+    result = follow_path(path, data, root)
     Enum.at(result, 0)
+  end
+
+  defp apply_template(data, template, root) do
+    do_remap(data, template, root)
   end
 
   @spec follow_path(path, Node.t, Node.t) :: any

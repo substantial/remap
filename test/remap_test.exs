@@ -35,6 +35,27 @@ defmodule RemapTest do
     assert actual == "John"
   end
 
+  test "nested template" do
+    actual =
+      %{
+        children: [
+          %{first_name: "John"},
+          %{first_name: "Sally"},
+        ],
+      }
+      |> remap(%{
+        info: %{
+          child_names: ~p"children[*].first_name"l,
+        },
+      })
+
+    assert actual == %{
+      info: %{
+        child_names: ["John", "Sally"],
+      },
+    }
+  end
+
   test "map multiple keys" do
     actual =
       %{
