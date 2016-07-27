@@ -8,26 +8,26 @@ defmodule Remap do
     | {:child, member}
     | {:descendant, member}
   @type modifier :: ?s | ?l
-  @type mapping :: %{} | [any] | path
+  @type template :: %{} | [any] | path
 
-  @spec remap(Node.t, mapping) :: [any]
-  def remap(data, map_mapping) when is_map(map_mapping) do
-    for {key, value} <- map_mapping, into: %{}, do: {key, apply_mapping(value, data)}
+  @spec remap(Node.t, template) :: [any]
+  def remap(data, template) when is_map(template) do
+    for {key, value} <- template, into: %{}, do: {key, apply_template(value, data)}
   end
 
-  def remap(data, list_mapping) when is_list(list_mapping) do
-    for value <- list_mapping, do: apply_mapping(value, data)
+  def remap(data, template) when is_list(template) do
+    for value <- template, do: apply_template(value, data)
   end
 
-  def remap(data, mapping) do
-    apply_mapping(mapping, data)
+  def remap(data, template) do
+    apply_template(template, data)
   end
 
-  defp apply_mapping({:remap_path, :list, path}, data) do
+  defp apply_template({:remap_path, :list, path}, data) do
     follow_path(path, data, data)
   end
 
-  defp apply_mapping({:remap_path, :element, path}, data) do
+  defp apply_template({:remap_path, :element, path}, data) do
     result = follow_path(path, data, data)
     Enum.at(result, 0)
   end
